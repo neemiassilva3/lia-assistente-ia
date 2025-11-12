@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Boas-vindas — Lia Assistente</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+</head>
+<body>
+
+  <div id="mainView" class="view">
+    <div class="score-display"><span class="trophy">🏆</span> Pontos: <span id="pointsDisplay" class="points">0</span></div>
+    
+    <div class="stage" role="main">
+      
+      <header><h1 id="welcomeTitle"></h1></header>
+
+      <div id="liaSpeechBubble">
+        <div class="bubble-content">
+          <span id="bubbleText"></span>
+          <div id="liaFollowUp" style="display: none;">
+            <span id="followUpText"></span>
+            <button id="followUpBtn" class="action-button action-button--primary" style="padding: 8px 16px; font-size: 0.9rem;">Sim</button>
+          </div>
+        </div>
+      </div>
+      
+      <section id="avatarContainer" class="avatar-frame floating">
+        <div class="bg-circle">
+          <figure class="avatar">
+            <video id="avatarVideoMain" src="{{ url_for('static', filename='lia_idle.mp4') }}" autoplay muted loop playsinline alt="Avatar Lia"></video>
+          </figure>
+        </div>
+      </section>
+      
+      <div class="interaction-area">
+        <section id="tokenSection">
+          <p class="token-label">insira aqui o seu token</p>
+          <div class="token-inputs">
+            <input type="text" maxlength="1"><input type="text" maxlength="1"><input type="text" maxlength="1">
+          </div>
+          <button type="button" class="no-vip-button">Não tenho vip</button>
+        </section>
+        <div id="actionButtons" class="action-buttons-container">
+          <button id="btnYes" class="action-button action-button--primary">Claro!</button>
+          <button id="btnNo" class="action-button">Depois</button>
+        </div>
+        
+        <div id="chatContainer">
+          
+          <div id="questionHistoryPills"></div>
+
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Pergunte algo para a Lia...">
+            <button id="sendBtn" class="action-button action-button--primary">
+              <svg id="micIcon" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
+              <svg id="sendIcon" style="display: none;" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        </div>
+    </div>
+    <img src="{{ url_for('static', filename='nuvens.png') }}" class="cloud cloud1" alt=""><img src="{{ url_for('static', filename='nuvens.png') }}" class="cloud cloud2" alt=""><img src="{{ url_for('static', filename='nuvens.png') }}" class="cloud cloud3" alt="">
+  </div>
+
+  <div id="cameraView" class="view hidden">
+     <div class="camera-layout">
+      <div class="camera-left-panel">
+        <header><h1 id="cameraWelcomeTitle"></h1></header>
+        <section class="avatar-frame">
+          <div class="bg-circle">
+            <figure class="avatar">
+              <video id="avatarVideoCamera" src="{{ url_for('static', filename='lia_idle.mp4') }}" autoplay muted loop playsinline alt="Avatar Lia"></video>
+            </figure>
+          </div>
+        </section>
+      </div>
+      <div class="camera-right-panel">
+        <video id="cameraFeed" autoplay playsinline></video>
+        <div class="camera-button-container">
+          <button id="captureBtn" class="action-button action-button--primary">Tirar Foto</button>
+        </div>
+        <canvas id="photoCanvas" style="display:none;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="reviewView" class="view hidden">
+     <div>
+      <img id="reviewImage" class="review-photo" alt="Sua foto com a Lia">
+      <div id="reviewButtons" class="action-buttons-container visible">
+        <button id="btnRetake" class="action-button">Tirar Outra</button>
+        <button id="btnConfirm" class="action-button action-button--primary">Ficou Ótima!</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</body>
+</html>

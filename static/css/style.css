@@ -1,0 +1,232 @@
+:root{
+  --bg: #ffffff;
+  --primary: #2f9deb;
+  --primary-light: #5abaff;
+  --text: #12324a;
+  --muted: #6b7d8c;
+  --transition-speed: 0.6s;
+  --easing-curve: cubic-bezier(0.4, 0, 0.2, 1);
+}
+body{ margin:0; background: var(--bg); color: var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding: 24px; box-sizing:border-box; overflow:hidden; font-family: 'Inter', sans-serif; }
+
+.view {
+  width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; text-align: center;
+  transition: opacity var(--transition-speed) var(--easing-curve), visibility var(--transition-speed) var(--easing-curve);
+}
+.view.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.score-display { position: fixed; top: 20px; right: 20px; background: white; padding: 10px 24px; border-radius: 999px; z-index: 10;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 600; }
+.score-display .points { color: var(--primary); font-weight: 700; }
+
+.stage{ 
+  width: min(980px, 96vw); display: flex; flex-direction: column; align-items: center; text-align: center;
+  position: relative; 
+}
+
+header { 
+  width: 100%; z-index: 3; transition: all var(--transition-speed) var(--easing-curve); 
+  margin-bottom: 20px;
+}
+header h1{ margin:0; font-size: clamp(1.15rem, 2.4vw, 2.2rem); line-height:1.05; color: var(--primary); font-weight:700; min-height: 2.2em;
+  display: flex; align-items: center; justify-content: center; }
+
+.avatar-frame { 
+  position: relative; display: flex; justify-content: center; align-items: center;
+  transition: transform var(--transition-speed) var(--easing-curve); 
+  z-index: 2; 
+}
+@keyframes avatarFloat { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+.avatar-frame.floating { animation: avatarFloat 8s ease-in-out infinite alternate; }
+.bg-circle { display: flex; justify-content: center; align-items: center; width: 280px; height: 280px; border-radius: 50%; background: rgba(0, 153, 255, 0.08); }
+.avatar { width: 250px; height: 250px; border-radius: 50%; overflow: hidden; }
+.avatar video { 
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%; box-shadow: 0 20px 40px rgba(17,41,68,0.12); 
+}
+
+.interaction-area { min-height: 150px; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 600px; position: relative; z-index: 3; }
+
+#tokenSection, .action-buttons-container, #chatContainer { position: absolute; transition: opacity 0.4s ease, transform 0.4s ease; }
+#tokenSection { display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(20px); pointer-events: none;}
+#tokenSection.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+.token-inputs { display: flex; gap: 10px; }
+.token-inputs input { width: 60px; height: 75px; text-align: center; font-size: 2.2rem; font-weight: 700; color: var(--text); border: 1px solid #e0e8f0; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); outline: none; transition: all .2s; text-transform: uppercase; }
+.token-inputs input:focus { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(47,157,255,0.15); }
+.no-vip-button { background: none; border: none; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 15px; padding: 5px; text-decoration: none; }
+.action-buttons-container { display: flex; justify-content: center; gap: 20px; width: 100%; opacity: 0; transform: translateY(20px); pointer-events: none;}
+.action-buttons-container.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+.action-button {
+  padding: 16px 36px; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; border-radius: 999px; cursor: pointer; border: none;
+  background-color: #ffffff; color: var(--text); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(17,41,68,0.1), 0 2px 6px rgba(17,41,68,0.08);
+}
+.action-button:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(17,41,68,0.15), 0 5px 10px rgba(17,41,68,0.08); }
+.action-button--primary { background-image: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 100%); color: white; box-shadow: 0 5px 20px rgba(47,157,255,0.3); }
+.action-button--primary:hover { box-shadow: 0 10px 30px rgba(47,157,255,0.4); }
+
+/* --- NUVEM DE RESPOSTA (MOBILE-FIRST) --- */
+#liaSpeechBubble {
+  position: relative; 
+  width: 100%; 
+  max-width: 500px; 
+  margin: 0 auto 20px auto; 
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.8);
+  transition: opacity 0.4s var(--easing-curve), transform 0.4s var(--easing-curve), visibility 0.4s var(--easing-curve);
+}
+
+#liaSpeechBubble.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.bubble-content {
+  /* Caminho para a imagem agora é relativo à pasta static */
+  background-image: url('../formato_chat.png');
+  background-size: 100% 100%; 
+  background-repeat: no-repeat;
+  padding-top: 55px;
+  padding-right: 65px;
+  padding-bottom: 55px;
+  padding-left: 100px; 
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+  min-height: 100px; 
+}
+
+/* Regra de @media para telas de DESKTOP */
+@media (min-width: 768px) {
+  header {
+    margin-bottom: 0; 
+  }
+  
+  #liaSpeechBubble {
+    position: absolute;
+    left: 55%; 
+    top: 130px; 
+    width: 420px;
+    max-width: 45vw;
+    margin-bottom: 0; 
+  }
+}
+
+#liaFollowUp {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e8f0;
+  font-weight: 600;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --- ESTILOS DO CHAT --- */
+#chatContainer {
+  display: flex; flex-direction: column; width: 100%;
+  height: auto; 
+  opacity: 0; transform: translateY(20px); pointer-events: none;
+}
+#chatContainer.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+#questionHistoryPills {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  min-height: 40px;
+  flex-wrap: wrap; 
+}
+
+.question-pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: pillFadeIn 0.5s ease forwards;
+}
+
+@keyframes pillFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-pill--primary {
+  background-image: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(47,157,255,0.25);
+}
+.question-pill--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(47,157,255,0.35);
+}
+
+.question-pill--secondary {
+  background-color: #ffffff;
+  color: var(--muted);
+  box-shadow: 0 2px 8px rgba(17,41,68,0.1);
+}
+.question-pill--secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17,41,68,0.15);
+  color: var(--text);
+}
+
+.chat-input-area { display: flex; gap: 10px; }
+#chatInput { flex-grow: 1; border: 2px solid #e0e8f0; border-radius: 999px; padding: 14px 20px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+#chatInput:focus { border-color: var(--primary); }
+#sendBtn { flex-shrink: 0; width: 54px; height: 54px; padding: 0; display: flex; align-items: center; justify-content: center; }
+#sendBtn svg { width: 24px; height: 24px; fill: white; }
+
+@keyframes pulseMic {
+  0% { transform: scale(1); box-shadow: 0 5px 20px rgba(47,157,255,0.3); }
+  50% { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255, 82, 82, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 5px 20px rgba(47,157,255,0.3); }
+}
+#sendBtn.listening {
+  animation: pulseMic 1.5s ease-in-out infinite;
+  background-image: linear-gradient(45deg, #ff5252 0%, #ff8a80 100%);
+}
+
+.cloud { position: absolute; pointer-events: none; animation-name: floatCloud; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+.cloud1 { width: 100px; top: 20%; left: 10%; animation-duration: 20s; opacity: 0.8; z-index: 1; }
+.cloud2 { width: 140px; top: 50%; right: 5%; animation-duration: 26s; opacity: 0.95; z-index: 3; }
+.cloud3 { width: 80px; bottom: 15%; left: 20%; animation-duration: 18s; opacity: 0.7; z-index: 1; }
+@keyframes floatCloud { 0% { transform: translate(0, 0); } 50% { transform: translate(25px, 0); } 100% { transform: translate(0, 0); } }
+
+/* Estilos da Câmera (sem mudanças) */
+#cameraView .camera-layout { display: flex; flex-direction: column; gap: 20px; padding: 20px; width: 100%; height: 100%; align-items: center; justify-content: center;}
+#cameraView .camera-left-panel { flex-shrink: 0; opacity: 0; transform: translateY(-50px); transition: all var(--transition-speed) var(--easing-curve); }
+#cameraView .camera-left-panel .avatar-frame { transform: scale(0.5); margin-top: -50px; }
+#cameraView .camera-right-panel { flex-grow: 1; max-width: 90vw; max-height: 60vh; width: 100%; position: relative; opacity: 0; transform: scale(0.9); transition: all var(--transition-speed) var(--easing-curve) 0.2s; aspect-ratio: 4 / 3; }
+body.camera-mode #cameraView .camera-left-panel, body.camera-mode #cameraView .camera-right-panel { opacity: 1; transform: none; }
+#cameraFeed { width: 100%; height: 100%; object-fit: cover; border-radius: 15px; border: 4px solid white; box-shadow: 0 20px 50px rgba(0,0,0,0.3); background-color: #333; }
+#cameraView .camera-button-container { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); z-index: 10; }
+@media (min-width: 768px) {
+  #cameraView .camera-layout { flex-direction: row; gap: 5vw; }
+  #cameraView .camera-left-panel { transform: translateX(-100px); }
+  #cameraView .camera-left-panel .avatar-frame { transform: scale(0.6); margin-top: 0; }
+  #cameraView .camera-right-panel { max-width: 80vh; max-height: unset; }
+}
+
+#reviewView .review-photo { max-width: 90vw; max-height: 60vh; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+.notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+.toast-notification {
+    background: linear-gradient(45deg, var(--primary), #5abaff); color: white; padding: 14px 22px; border-radius: 8px; box-shadow: 0 5px 20px rgba(17, 41, 68, .2);
+    margin-top: 10px; font-weight: 600; font-size: 0.95rem; animation: slideIn 0.5s ease-out forwards, slideOut 0.5s ease-in 4s forwards;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(110%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(120%); } }
